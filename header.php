@@ -1,3 +1,8 @@
+<?php
+require_once('library/frontend.class.php');
+$front->isLoggedin();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

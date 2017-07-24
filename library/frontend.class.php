@@ -4,8 +4,8 @@ error_reporting(E_WARNING & E_ERROR & ~E_NOTICE );
 require_once('database.php');
 require_once('config.php');
 $front=new frontend;
-$math = new EvalMath;
-$front->saveData();
+//$math = new EvalMath;
+//$front->saveData();
 class frontend{
     public function frontend()
     {
@@ -14,7 +14,7 @@ class frontend{
     public function isLoggedin()
     {
         @session_start();
-        if(isset($_SESSION['user'])||$this->cookieLogin())
+        if(isset($_SESSION['user']))
         {
             if(basename($_SERVER['PHP_SELF'])=='login.php'||basename($_SERVER['PHP_SELF'])=='forgotpassword.php'){
                 header('location:index.php');
@@ -24,8 +24,8 @@ class frontend{
         }
         else
         {
-            if(basename($_SERVER['PHP_SELF'])!='login.php'&&basename($_SERVER['PHP_SELF'])!='forgotpassword.php'&&basename($_SERVER['PHP_SELF'])!='index.php'&&basename($_SERVER['PHP_SELF'])!='quote.php'&&basename($_SERVER['PHP_SELF'])!='policy-details.php'&&basename($_SERVER['PHP_SELF'])!='about-us.php'&&basename($_SERVER['PHP_SELF'])!='contact_us.php'&&basename($_SERVER['PHP_SELF'])!='privacy-policy.php'&&basename($_SERVER['PHP_SELF'])!='terms-and-conditons.php'&&basename($_SERVER['PHP_SELF'])!='order-details.php'){
-                header('location:index.php#Login');
+            if(basename($_SERVER['PHP_SELF'])!='login.php'&&basename($_SERVER['PHP_SELF'])!='forgotpassword.php'&&basename($_SERVER['PHP_SELF'])!='quote.php'&&basename($_SERVER['PHP_SELF'])!='policy-details.php'&&basename($_SERVER['PHP_SELF'])!='about-us.php'&&basename($_SERVER['PHP_SELF'])!='contact_us.php'&&basename($_SERVER['PHP_SELF'])!='privacy-policy.php'&&basename($_SERVER['PHP_SELF'])!='terms-and-conditons.php'&&basename($_SERVER['PHP_SELF'])!='order-details.php'){
+                header('location:login.php');
                 exit;
             }
             return false;
@@ -52,9 +52,9 @@ class frontend{
             exit;
         }
         $query = "SELECT *
-				  FROM users
-				  WHERE email = '".$username."'
-				  AND password = '".$password."' AND status='1' AND type=4
+				  FROM pms_login
+				  WHERE user = '".$username."'
+				  AND password = '".$password."' AND status='1' AND role=0
 				  ";
         $result = $db->query($query);
         $result_row=$db->fetch($result);
@@ -65,12 +65,19 @@ class frontend{
         }
         $now=date('Y-m-d H:i:s');
         $_SESSION['logged'] = $result_row['loggedin'];
-        $result=$db->query("update users set loggedin='$now' where email='$username'");
+        $result=$db->query("INSERT INTO `users_log`(`loggedin`, `email`) VALUES (loggedin='$now' WHERE email='$username')");
         if (!isset($_SESSION))
             @session_start();
+        $query2 = "SELECT *
+				  FROM pms_user
+				  WHERE user_id = '".$ID."'
+				  AND status='1'
+				  ";
+        $result2 = $db->query($query2);
+        $result_row2=$db->fetch($result2);
         $_SESSION['user'] = $ID;
-        $_SESSION['name'] =$result_row['firstname'];
-        $_SESSION['email'] =$result_row['email'];
+        $_SESSION['name'] =$result_row2['firstname'];
+        $_SESSION['email'] =$result_row2['email'];
         if ($remember) {
             $expire_time = time() + 30000;
             setcookie('adminuser', $username, $expire_time);
@@ -82,6 +89,7 @@ class frontend{
             setcookie('expire_time', false);
         }
         echo 'success';
+        header('location:index.php');
         exit;
     }
     public function register($postdata)
@@ -150,7 +158,7 @@ SaveKubwa has been built with the user in mind so we would love to have your fee
             exit;
         }
     }
-   
-    
+
+
 }
 ?>
