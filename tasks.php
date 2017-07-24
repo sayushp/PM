@@ -2,8 +2,10 @@
 <?php
 $task_db = 'pms_task';
 $project_db = 'pms_project';
+$user_db = 'pms_user';
 $task_data=$front->db->gettable($task_db);
 $project_data=$front->db->gettable($project_db);
+$user_data = $front->db->gettable($user_db);
 ?>
 <div class="page-container">  
 
@@ -50,7 +52,7 @@ $project_data=$front->db->gettable($project_db);
                      <li><i class="fa fa-calendar"></i>Start date: '.$task["start_date"].'<span>|</span></li>
                      <li><i class="fa fa-calendar"></i>End date: '.$task["end_date"].'<span>|</span></li>
                      <li><i class="fa fa-map-marker"></i>Location: '.$task["location"].'</li>
-                     <li class="pull-right last"><a href=""><i class="fa fa-trash"></i>Delete</a></li>
+                     <li class="pull-right last"><a href="ajax-process.php?delete&task='.$task["ID"].'"><i class="fa fa-trash"></i>Delete</a></li>
                      <li class="pull-right"><a href=""><i class="fa fa-pencil-square-o"></i>Edit</a></li>
                      
                  </ul>
@@ -76,35 +78,38 @@ $project_data=$front->db->gettable($project_db);
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">Add New Task</h4> </div>
             <div class="modal-body">
-                <form class="form-horizontal">
+                <form class="form-horizontal" action="ajax-process.php" method="post">
                     <div class="form-group">
-                        <select name="project">
+                        <select name="project_id">
                             <?php
                             foreach ($project_data as $project):
-                                echo '<option name="'.$project["ID"].'">'.$project["name"].'</option>';
+                                echo '<option value="'.$project["ID"].'">'.$project["name"].'</option>';
                                 endforeach;
                             ?>
                         </select>
-                            <input type="text" class="form-control"  placeholder="Task Name">
+                            <input name="name" type="text" class="form-control"  placeholder="Task Name">
                     </div>
                     <div class="form-group">
-                            <input type="text" class="form-control"  placeholder="Assigned To">
+                        <textarea name="description"  placeholder="Description"></textarea>
                     </div>
                      <div class="form-group">
-                            <input type="text" class="form-control"  placeholder="About">
+                         <select name="assigned_to">
+                             <?php
+                             foreach ($user_data as $user):
+                                 echo '<option value="'.$user["user_id"].'">'.$user["firstname"].'</option>';
+                             endforeach;
+                             ?>
+                         </select>
                     </div>
                      <div class="form-group">
-                            <input type="text" class="form-control"  placeholder="Location">
+                            <input type="text" class="form-control datepicker" name="start_date"  placeholder="Start Date">
                     </div>
                      <div class="form-group">
-                            <input type="text" class="form-control datepicker"  placeholder="Start Date">
-                    </div>
-                     <div class="form-group">
-                            <input type="text" class="form-control datepicker"  placeholder="End Date">
+                            <input type="text" class="form-control datepicker" name="end_date"  placeholder="End Date">
                     </div>
                     <div class="form-group ">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary save">Save</button>
+                        <button type="submit" class="btn btn-primary save" name="add-tasks">Save</button>
                     </div>
                    
                 </form>
